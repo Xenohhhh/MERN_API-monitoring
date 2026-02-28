@@ -5,7 +5,7 @@ import { User } from "../models/user.models.js";
 
 const generateAccessTokens = (user) => {
     return jwt.sign({
-        id: user._id,
+        _id: user._id,
         email: user.email
     },
         process.env.ACCESS_TOKEN_SECRET,

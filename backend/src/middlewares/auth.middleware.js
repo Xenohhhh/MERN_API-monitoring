@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
 import { User } from "../models/user.models.js"
 
-const verifyJWT = async (req, res, next) => {
+export const verifyJWT = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization
 
@@ -19,7 +19,7 @@ const verifyJWT = async (req, res, next) => {
             process.env.ACCESS_TOKEN_SECRET
         )
 
-        const user = await User.findById(decode._id).select("-password")
+        const user = await User.findById(decode._id).select("-hashPassword")
 
         if (!user) {
             return res.status(401).json({
