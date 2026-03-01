@@ -77,3 +77,32 @@ export const getFunction = async (req, res) => {
         })
     }
 }
+
+export const deleteFunction = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        const monitor = await Monitor.findOne({
+            _id: id,
+            userId: req.user._id
+        })
+
+        if (!monitor) {
+            return res.status(404).json({
+                message: "Monitor not found"
+            });
+        }
+
+        await monitor.deleteOne();
+
+        return res.status(200).json({
+            message: "Monitor deleted successfully"
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Server error"
+        })
+    }
+}
