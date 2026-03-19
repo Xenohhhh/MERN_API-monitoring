@@ -1,0 +1,42 @@
+# 🔹 Node modules (BIG - never push)
+node_modules/
+
+# 🔹 Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 🔹 Environment variables (IMPORTANT - secrets)
+.env
+.env.*
+
+# 🔹 Build / dist files
+dist/
+build/
+
+# 🔹 OS files
+.DS_Store
+Thumbs.db
+
+# 🔹 IDE / Editor files
+.vscode/
+.idea/
+
+# 🔹 Temporary files
+tmp/
+temp/
+
+# 🔹 Coverage (testing)
+coverage/
+
+# 🔹 Lock files (optional - see note below)
+# package-lock.json
+# yarn.lock
+
+# 🔹 Redis dump (very important for your project)
+dump.rdb
+
+# 🔹 Misc
+*.swp
