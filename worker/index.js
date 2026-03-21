@@ -1,11 +1,11 @@
 import monitorQueue from "./queue.js";
 
 async function addJob() {
-  await monitorQueue.add("test-job", {
-    message: "test job",
+  await monitorQueue.add("monitorQueue", {
+    monitorId: "69a33a457846bd902d890365", 
   });
 
-  console.log("Job added!");
+  console.log("Monitor job added!");
 }
 
 addJob();
