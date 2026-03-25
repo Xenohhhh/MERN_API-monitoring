@@ -1,6 +1,7 @@
 import { User } from "../models/user.models.js"
 import { Monitor } from "../models/monitors.models.js"
 import { PLAN_LIMITS } from "../config/plans.js"
+import monitorQueue from "../../../worker/queue.js";
 
 
 export const postFunction = async (req, res) => {
@@ -80,12 +81,12 @@ export const getFunction = async (req, res) => {
 
 export const deleteFunction = async (req, res) => {
     try {
-        const { id } = req.params
+        const { id } = req.params;
 
         const monitor = await Monitor.findOne({
             _id: id,
             userId: req.user._id
-        })
+        });
 
         if (!monitor) {
             return res.status(404).json({
@@ -93,6 +94,16 @@ export const deleteFunction = async (req, res) => {
             });
         }
 
+        // Remove repeat job
+        await monitorQueue.removeRepeatable(
+            "monitor-api",
+            {
+                every: monitor.interval*1000,
+            },
+            id
+        );
+
+        // Delete from DB
         await monitor.deleteOne();
 
         return res.status(200).json({
@@ -103,6 +114,6 @@ export const deleteFunction = async (req, res) => {
         console.error(error);
         return res.status(500).json({
             message: "Server error"
-        })
+        });
     }
-}
+};

@@ -23,7 +23,8 @@ const worker = new Worker("monitorQueue",
         try {
             const res = await axios({
                 url: monitor.url,
-                method: monitor.method
+                method: monitor.method,
+                timeout: 5000
             })
 
             const responseTime = Date.now() - start;
@@ -55,6 +56,15 @@ const worker = new Worker("monitorQueue",
 
             console.log("DOWN:", monitor.url);
             console.log("Response time:", responseTime, "ms");
+            
+            if (err.response) {
+                console.log("Status Code:", err.response.status);
+            } else if (err.request) {
+                console.log("No response received");
+                console.log("Error Code:", err.code);
+            } else {
+                console.log("Error Message:", err.message);
+            }
 
 
 
