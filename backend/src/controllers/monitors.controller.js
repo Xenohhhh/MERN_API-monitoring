@@ -2,6 +2,7 @@ import { User } from "../models/user.models.js"
 import { Monitor } from "../models/monitors.models.js"
 import { PLAN_LIMITS } from "../config/plans.js"
 import monitorQueue from "../../../worker/queue.js";
+import {MonitorLog} from "../models/monitorLog.models.js"
 
 
 export const postFunction = async (req, res) => {
@@ -116,4 +117,51 @@ export const deleteFunction = async (req, res) => {
             message: "Server error"
         });
     }
+};
+
+export const getMonitorLogs = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const skip = (page - 1) * limit;
+
+    // Ownership check
+    const monitor = await Monitor.findOne({
+      _id: id,
+      userId: req.user._id,
+    });
+
+    if (!monitor) {
+      return res.status(404).json({
+        message: "Monitor not found",
+      });
+    }
+
+    // Fetch logs
+    const logs = await MonitorLog.find({ monitorId: id })
+      .sort({ checkedAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // Total count
+    const total = await MonitorLog.countDocuments({ monitorId: id });
+
+    return res.status(200).json({
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      logs,
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
 };

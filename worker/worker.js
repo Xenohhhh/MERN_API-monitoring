@@ -3,84 +3,75 @@ import axios from "axios";
 import connectDB from "../backend/src/db/index.js"
 import { Monitor } from "../backend/src/models/monitors.models.js"
 import { MonitorLog } from "../backend/src/models/monitorLog.models.js"
+import { sendEmail } from "../backend/src/utils/sendEmail.js";
 import dotenv from "dotenv";
 dotenv.config();
 
 await connectDB();
 
 const worker = new Worker("monitorQueue",
-    async (job) => {
-        const { monitorId } = job.data;
+  async (job) => {
+    const { monitorId } = job.data;
 
-        console.log("Processing monitor:", monitorId);
+    const monitor = await Monitor.findById(monitorId);
+    if (!monitor) return;
 
+    const start = Date.now();
 
-        // Fetch DB
-        const monitor = await Monitor.findById(monitorId);
+    let newStatus;
+    let responseTime;
 
-        const start = Date.now();
+    try {
+      const res = await axios({
+        url: monitor.url,
+        method: monitor.method,
+        timeout: 5000
+      });
 
-        try {
-            const res = await axios({
-                url: monitor.url,
-                method: monitor.method,
-                timeout: 5000
-            })
+      responseTime = Date.now() - start;
+      newStatus = "UP";
 
-            const responseTime = Date.now() - start;
-            console.log("UP:", monitor.url);
-            console.log("Response time:", responseTime, "ms");
+      console.log("UP:", monitor.url);
 
-            const newStatus = "UP";
+    } catch (err) {
+      responseTime = Date.now() - start;
+      newStatus = "DOWN";
 
-
-            await MonitorLog.create({
-                monitorId: monitorId,
-                status: "UP",
-                checkedAt: new Date(start),
-                responseTime: responseTime,
-            })
-
-            if (monitor.lastStatus !== newStatus) {
-                console.log(`Status changed: ${monitor.lastStatus} -> ${newStatus}`)
-            }
-
-            await Monitor.findByIdAndUpdate(monitorId, {
-                lastStatus: newStatus,
-                lastCheckedAt: new Date(),
-            })
-
-
-        } catch (err) {
-            const responseTime = Date.now() - start;
-
-            console.log("DOWN:", monitor.url);
-            console.log("Response time:", responseTime, "ms");
-            
-            if (err.response) {
-                console.log("Status Code:", err.response.status);
-            } else if (err.request) {
-                console.log("No response received");
-                console.log("Error Code:", err.code);
-            } else {
-                console.log("Error Message:", err.message);
-            }
-
-
-
-            await MonitorLog.create({
-                monitorId: monitorId,
-                status: "DOWN",
-                checkedAt: new Date(start),
-                responseTime: responseTime,
-                errorMessage: err.message
-            })
-        }
-    },
-    {
-        connection: {
-            host: "127.0.0.1",
-            port: 6379
-        }
+      console.log("DOWN:", monitor.url);
+      console.log("Error:", err.code || err.message);
     }
-)
+
+    // ALWAYS SAVE LOG
+    await MonitorLog.create({
+      monitorId,
+      status: newStatus,
+      checkedAt: new Date(start),
+      responseTime,
+    });
+
+    // COMPARE BEFORE UPDATE
+    const prevStatus = monitor.lastStatus;
+
+    if (prevStatus !== newStatus) {
+      console.log(`⚠️ Status changed: ${prevStatus} → ${newStatus}`);
+
+      await sendEmail(
+        process.env.EMAIL_USER,
+        "🚨 Monitor Alert",
+        `Monitor ${monitor.url} changed from ${prevStatus} to ${newStatus}`
+      );
+    }
+
+    // ALWAYS UPDATE DB
+    await Monitor.findByIdAndUpdate(monitorId, {
+      lastStatus: newStatus,
+      lastCheckedAt: new Date(),
+    });
+  },
+  {
+    connection: {
+      host: "127.0.0.1",
+      port: 6379
+    }
+  }
+);
