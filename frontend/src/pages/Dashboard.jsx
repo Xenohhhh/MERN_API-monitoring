@@ -14,11 +14,19 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getMonitors();
-      setMonitors(data?.monitors || []);
+      try {
+        const data = await getMonitors();
+        setMonitors(data?.monitors || []);
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    fetchData();
+    fetchData(); // initial load
+
+    const interval = setInterval(fetchData, 15000); // 🔥 every 15s
+
+    return () => clearInterval(interval); // cleanup
   }, []);
 
   // 📊 Stats

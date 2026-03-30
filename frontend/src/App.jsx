@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
+import MonitorDetails from "./pages/MonitorDetails";
 import "./index.css";
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Dashboard />} />
+        <Route path="/monitor/:id" element={<MonitorDetails />} />
       </Routes>
     </BrowserRouter>
   );
