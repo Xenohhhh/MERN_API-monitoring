@@ -25,7 +25,13 @@ const worker = new Worker("monitorQueue",
       const res = await axios({
         url: monitor.url,
         method: monitor.method,
-        timeout: 5000
+        timeout: 5000,
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+          "Accept":
+            "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        }
       });
 
       responseTime = Date.now() - start;

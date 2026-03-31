@@ -2,7 +2,7 @@ import { User } from "../models/user.models.js"
 import { Monitor } from "../models/monitors.models.js"
 import { PLAN_LIMITS } from "../config/plans.js"
 import monitorQueue from "../../../worker/queue.js";
-import {MonitorLog} from "../models/monitorLog.models.js"
+import { MonitorLog } from "../models/monitorLog.models.js"
 
 
 export const postFunction = async (req, res) => {
@@ -58,6 +58,25 @@ export const postFunction = async (req, res) => {
             url,
             interval: normalizedInterval
         });
+
+        const intervalMs = normalizedInterval * 1000;
+
+        await monitorQueue.removeRepeatable(
+            "monitor-api",
+            { every: intervalMs },
+            monitor._id.toString()
+        );
+
+        await monitorQueue.add(
+            "monitor-api",
+            { monitorId: monitor._id.toString() },
+            {
+                jobId: monitor._id.toString(),
+                repeat: {
+                    every: intervalMs,
+                },
+            }
+        );
 
 
         return res.status(201).json({
@@ -115,7 +134,7 @@ export const deleteFunction = async (req, res) => {
         await monitorQueue.removeRepeatable(
             "monitor-api",
             {
-                every: monitor.interval*1000,
+                every: monitor.interval * 1000,
             },
             id
         );
@@ -136,48 +155,48 @@ export const deleteFunction = async (req, res) => {
 };
 
 export const getMonitorLogs = async (req, res) => {
-  try {
-    const { id } = req.params;
+    try {
+        const { id } = req.params;
 
-    // Pagination
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+        // Pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
 
-    const skip = (page - 1) * limit;
+        const skip = (page - 1) * limit;
 
-    // Ownership check
-    const monitor = await Monitor.findOne({
-      _id: id,
-      userId: req.user._id,
-    });
+        // Ownership check
+        const monitor = await Monitor.findOne({
+            _id: id,
+            userId: req.user._id,
+        });
 
-    if (!monitor) {
-      return res.status(404).json({
-        message: "Monitor not found",
-      });
+        if (!monitor) {
+            return res.status(404).json({
+                message: "Monitor not found",
+            });
+        }
+
+        // Fetch logs
+        const logs = await MonitorLog.find({ monitorId: id })
+            .sort({ checkedAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        // Total count
+        const total = await MonitorLog.countDocuments({ monitorId: id });
+
+        return res.status(200).json({
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+            logs,
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Server error",
+        });
     }
-
-    // Fetch logs
-    const logs = await MonitorLog.find({ monitorId: id })
-      .sort({ checkedAt: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    // Total count
-    const total = await MonitorLog.countDocuments({ monitorId: id });
-
-    return res.status(200).json({
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-      logs,
-    });
-
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Server error",
-    });
-  }
 };

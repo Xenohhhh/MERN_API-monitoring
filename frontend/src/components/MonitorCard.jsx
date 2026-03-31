@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
+import { deleteMonitor } from "../services/monitorService";
 
 export default function MonitorCard({ monitor }) {
   const [uptime, setUptime] = useState(0);
@@ -74,38 +75,75 @@ export default function MonitorCard({ monitor }) {
     return `${Math.floor(diff / 60)} hr ago`;
   };
 
+  const handleDelete = async (e) => {
+    e.stopPropagation(); // 🔥 prevents card click
+
+    const confirmDelete = window.confirm("Delete this monitor?");
+    if (!confirmDelete) return;
+
+    try {
+      await deleteMonitor(monitor._id);
+
+      alert("Monitor deleted");
+
+      window.location.reload(); // quick refresh (we’ll improve later)
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete");
+    }
+  };
+
+
   return (
     <div
       onClick={() => navigate(`/monitor/${monitor._id}`)} // ✅ clickable
-      className="bg-white p-5 rounded-xl shadow hover:shadow-lg transition cursor-pointer"
+      className="bg-white p-5 rounded-xl shadow hover:shadow-lg transition group"
     >
       {/* 🔥 Header */}
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex justify-between items-start mb-2">
+
+        {/* LEFT */}
         <div className="flex items-center gap-2">
           <span
-            className={`w-2 h-2 rounded-full ${
-              monitor.lastStatus === "UP"
+            className={`w-2 h-2 rounded-full ${monitor.lastStatus === "UP"
                 ? "bg-green-500"
                 : monitor.lastStatus === "DOWN"
-                ? "bg-red-500"
-                : "bg-gray-400"
-            }`}
+                  ? "bg-red-500"
+                  : "bg-gray-400"
+              }`}
           />
           <h2 className="font-semibold">{monitor.name}</h2>
         </div>
 
-        <span
-          className={`px-2 py-1 rounded text-xs ${
-            monitor.lastStatus === "UP"
-              ? "bg-green-100 text-green-600"
-              : monitor.lastStatus === "DOWN"
-              ? "bg-red-100 text-red-600"
-              : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          {monitor.lastStatus}
-        </span>
+        {/* RIGHT */}
+        <div className="flex items-center gap-2">
+
+          <span
+            className={`px-2 py-1 rounded text-xs ${monitor.lastStatus === "UP"
+                ? "bg-green-100 text-green-600"
+                : "bg-red-100 text-red-600"
+              }`}
+          >
+            {monitor.lastStatus}
+          </span>
+
+          {/* 🔥 DELETE (HOVER ONLY) */}
+          <button
+            onClick={handleDelete}
+            className="
+        opacity-0 
+        group-hover:opacity-100 
+        transition 
+        duration-200 
+        text-gray-400 hover:text-red-500
+      "
+          >
+            🗑
+          </button>
+
+        </div>
       </div>
+
 
       {/* 🔗 URL */}
       <p className="text-gray-500 text-sm mb-3">
@@ -119,8 +157,8 @@ export default function MonitorCard({ monitor }) {
           {monitor.lastStatus === "DOWN"
             ? "Failed"
             : responseTime
-            ? `${responseTime} ms`
-            : "-- ms"}
+              ? `${responseTime} ms`
+              : "-- ms"}
         </span>
 
         <span>
@@ -149,11 +187,10 @@ export default function MonitorCard({ monitor }) {
       {/* 📊 Uptime */}
       <div className="h-2 bg-gray-200 rounded mb-1">
         <div
-          className={`h-2 rounded ${
-            monitor.lastStatus === "UP"
-              ? "bg-green-500"
-              : "bg-red-500"
-          }`}
+          className={`h-2 rounded ${monitor.lastStatus === "UP"
+            ? "bg-green-500"
+            : "bg-red-500"
+            }`}
           style={{ width: `${uptime}%` }}
         />
       </div>
