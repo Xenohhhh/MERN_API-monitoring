@@ -91,7 +91,7 @@ export default function MonitorDetails() {
 
         <div className="bg-white p-4 rounded-xl shadow">
           <p className="text-gray-500 text-sm">Check Interval</p>
-          <h2 className="text-xl font-bold">300s</h2>
+          <h2 className="text-xl font-bold">10s</h2>
         </div>
 
         <div className="bg-white p-4 rounded-xl shadow">

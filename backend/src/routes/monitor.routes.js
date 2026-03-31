@@ -4,7 +4,7 @@ import {verifyJWT} from "../middlewares/auth.middleware.js"
 
 const router = Router()
 
-router.route("/").post(verifyJWT, postFunction)
+router.route("/add").post(verifyJWT, postFunction)
 router.route("/").get(verifyJWT, getFunction)
 router.route("/:id").delete(verifyJWT, deleteFunction)
 router.route("/:id/logs").get(verifyJWT, getMonitorLogs);

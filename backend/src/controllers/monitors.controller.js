@@ -8,8 +8,9 @@ import {MonitorLog} from "../models/monitorLog.models.js"
 export const postFunction = async (req, res) => {
     try {
         const { name, url, interval } = req.body
+        const normalizedInterval = Number(interval);
 
-        if (!name || !url || !interval) {
+        if (!name || !url || !normalizedInterval) {
             return res.status(400).json({
                 message: "All fields should be present"
             })
@@ -22,6 +23,18 @@ export const postFunction = async (req, res) => {
             })
         }
 
+        if (!PLAN_LIMITS[req.user.plan]) {
+            return res.status(400).json({
+                message: "Invalid user plan"
+            });
+        }
+
+        if (![60, 300, 600].includes(normalizedInterval)) {
+            return res.status(400).json({
+                message: "Interval must be 60, 300, or 600 seconds"
+            });
+        }
+
         const existingCount = await Monitor.countDocuments({
             userId: req.user._id,
             isActive: true
@@ -32,7 +45,10 @@ export const postFunction = async (req, res) => {
 
         if (existingCount >= limit) {
             return res.status(403).json({
-                message: "Monitor limit reached for your plan"
+                message: `Monitor limit reached for your ${req.user.plan} plan (${existingCount}/${limit})`,
+                plan: req.user.plan,
+                currentCount: existingCount,
+                limit
             });
         }
 
@@ -40,7 +56,7 @@ export const postFunction = async (req, res) => {
             userId: req.user._id,
             name,
             url,
-            interval
+            interval: normalizedInterval
         });
 
 

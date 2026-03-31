@@ -21,7 +21,7 @@ async function startScheduler() {
             {
                 jobId: monitor._id.toString(),
                 repeat: {
-                    every: 10000
+                    every: monitor.interval * 1000
                 }
             }
         )

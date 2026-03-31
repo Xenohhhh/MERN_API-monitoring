@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { getMonitors } from "../services/monitorService";
 import MonitorCard from "../components/MonitorCard";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const [monitors, setMonitors] = useState([]);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -77,9 +79,21 @@ export default function Dashboard() {
 
       {/* 📦 Monitor Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
         {monitors.map((m) => (
           <MonitorCard key={m._id} monitor={m} />
         ))}
+
+        {/* ➕ Add Monitor Card */}
+        <div
+          onClick={() => navigate("/add-monitor")}
+          className="flex items-center justify-center bg-white rounded-xl shadow hover:shadow-lg transition cursor-pointer border-2 border-dashed border-gray-300"
+        >
+          <button className="bg-blue-600 text-white px-4 py-2 rounded">
+            + Add Monitor
+          </button>
+        </div>
+
       </div>
     </div>
   );
