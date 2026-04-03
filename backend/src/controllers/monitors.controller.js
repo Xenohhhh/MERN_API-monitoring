@@ -81,7 +81,8 @@ export const postFunction = async (req, res) => {
 
         return res.status(201).json({
             message: "Monitor created successfully",
-            monitor
+            monitor,
+            limit: PLAN_LIMITS[req.user.plan]
         });
     }
     catch (error) {

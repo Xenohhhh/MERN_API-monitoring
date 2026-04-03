@@ -124,7 +124,7 @@ export default function MonitorCard({ monitor }) {
                 : "bg-red-100 text-red-600"
               }`}
           >
-            {monitor.lastStatus}
+            {monitor.lastStatus} • recent
           </span>
 
           {/* 🔥 DELETE (HOVER ONLY) */}
@@ -196,7 +196,7 @@ export default function MonitorCard({ monitor }) {
       </div>
 
       <p className="text-xs text-right text-gray-500">
-        {uptime}% uptime
+        {uptime}% uptime (last {chartData.length} checks)
       </p>
     </div>
   );
