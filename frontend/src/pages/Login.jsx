@@ -16,7 +16,7 @@ export default function Login() {
       localStorage.setItem("token", res.data.accessToken);
 
       // redirect
-      window.location.href = "/";
+      window.location.href = "/dashboard";
     } catch (err) {
       console.error(err);
       alert("Login failed");
