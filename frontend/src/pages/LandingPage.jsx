@@ -29,7 +29,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
 
-      {/* 🔥 NAVBAR */}
+      {/* NAVBAR */}
       <div className="flex justify-between items-center px-8 py-4 border-b bg-white">
         <h1 className="text-xl font-bold text-blue-600">MonitorX</h1>
 
@@ -47,7 +47,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* 🔥 HERO */}
+      {/* HERO */}
       <motion.div
         initial="hidden"
         animate="show"
@@ -92,7 +92,7 @@ export default function LandingPage() {
         </motion.div>
       </motion.div>
 
-      {/* 🔥 STATS */}
+      {/* STATS */}
       <motion.div
         initial="hidden"
         whileInView="show"
@@ -119,7 +119,7 @@ export default function LandingPage() {
         ))}
       </motion.div>
 
-      {/* 🔥 FEATURES */}
+      {/* FEATURES */}
       <div className="px-10 py-16">
         <motion.h2
           initial="hidden"
@@ -164,7 +164,7 @@ export default function LandingPage() {
         </motion.div>
       </div>
 
-      {/* 🔥 CTA */}
+      {/* CTA */}
       <motion.div
         initial="hidden"
         whileInView="show"
@@ -190,7 +190,7 @@ export default function LandingPage() {
         </div>
       </motion.div>
 
-      {/* 🔥 FOOTER */}
+      {/* FOOTER */}
       <div className="border-t py-6 text-center text-gray-500 text-sm">
         © 2026 MonitorX. All rights reserved.
       </div>

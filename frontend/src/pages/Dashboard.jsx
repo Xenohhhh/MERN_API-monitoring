@@ -3,10 +3,17 @@ import { getMonitors } from "../services/monitorService";
 import MonitorCard from "../components/MonitorCard";
 import { useNavigate } from "react-router-dom";
 
+
 export default function Dashboard() {
   const [monitors, setMonitors] = useState([]);
   const [limit, setLimit] = useState(5); // fallback
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
 
   const fetchData = async () => {
     try {
@@ -30,11 +37,25 @@ export default function Dashboard() {
       <div className="p-6 bg-gray-50 min-h-screen flex flex-col">
 
         {/* Header */}
-        <h1 className="text-3xl font-bold mb-1">Dashboard</h1>
+        <div className="flex justify-between items-start mb-4">
 
-        <p className="text-gray-500 mb-6">
-          Monitor your services in real-time
-        </p>
+          {/* Left side */}
+          <div>
+            <h1 className="text-3xl font-bold mb-1">Dashboard</h1>
+            <p className="text-gray-500">
+              Monitor your services in real-time
+            </p>
+          </div>
+
+          {/* 🔥 Right side (Logout) */}
+          <button
+            onClick={handleLogout}
+            className="text-red-500 border border-red-300 px-3 py-1 rounded hover:bg-red-50 transition"
+          >
+            Logout
+          </button>
+
+        </div>
 
         {/* 🔥 EMPTY STATE */}
         <div className="flex flex-col items-center justify-center flex-1">
@@ -59,11 +80,21 @@ export default function Dashboard() {
     <div className="p-6 bg-gray-50 min-h-screen">
 
       {/* Header */}
-      <h1 className="text-3xl font-bold mb-1">Dashboard</h1>
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h1 className="text-3xl font-bold mb-1">Dashboard</h1>
+          <p className="text-gray-500">
+            Monitor your services in real-time
+          </p>
+        </div>
 
-      <p className="text-gray-500 mb-4">
-        Monitor your services in real-time
-      </p>
+        <button
+          onClick={handleLogout}
+          className="text-red-500 border border-red-200 px-3 py-1 rounded hover:bg-red-50 transition"
+        >
+          Logout
+        </button>
+      </div>
 
       {/* 🔥 PLAN USAGE */}
       <div className="mb-6">
