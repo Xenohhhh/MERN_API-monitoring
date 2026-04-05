@@ -1,4 +1,5 @@
 export const PLAN_LIMITS = {
-    free: 3,
-    pro: 20
+    free: 5,
+    pro: 30,
+    premium: 121
 };

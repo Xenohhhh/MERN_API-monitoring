@@ -32,6 +32,24 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
+  const headerActions = (
+    <div className="flex items-center gap-3">
+      <button
+        onClick={() => navigate("/pricing")}
+        className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+      >
+        Upgrade
+      </button>
+
+      <button
+        onClick={handleLogout}
+        className="text-red-500 border border-red-300 px-3 py-1 rounded hover:bg-red-50 transition"
+      >
+        Logout
+      </button>
+    </div>
+  );
+
   if (monitors.length === 0) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen flex flex-col">
@@ -47,14 +65,7 @@ export default function Dashboard() {
             </p>
           </div>
 
-          {/* 🔥 Right side (Logout) */}
-          <button
-            onClick={handleLogout}
-            className="text-red-500 border border-red-300 px-3 py-1 rounded hover:bg-red-50 transition"
-          >
-            Logout
-          </button>
-
+          {headerActions}
         </div>
 
         {/* 🔥 EMPTY STATE */}
@@ -88,12 +99,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <button
-          onClick={handleLogout}
-          className="text-red-500 border border-red-200 px-3 py-1 rounded hover:bg-red-50 transition"
-        >
-          Logout
-        </button>
+        {headerActions}
       </div>
 
       {/* 🔥 PLAN USAGE */}

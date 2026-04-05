@@ -95,3 +95,29 @@ export const loginUser = async (req, res) => {
         console.error(error)
     }
 }
+
+export const upgradePlan = async (req, res) => {
+  try {
+    const { plan } = req.body;
+
+    if (!["free", "pro", "premium"].includes(plan)) {
+      return res.status(400).json({
+        message: "Invalid plan"
+      });
+    }
+
+    const user = await User.findById(req.user._id);
+
+    user.plan = plan;
+    await user.save();
+
+    return res.json({
+      message: "Plan updated",
+      plan: user.plan
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

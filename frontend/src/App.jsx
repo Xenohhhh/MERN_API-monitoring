@@ -5,6 +5,7 @@ import MonitorDetails from "./pages/MonitorDetails";
 import AddMonitor from "./pages/AddMonitor";
 import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Resgister";
+import Pricing from "./pages/Pricing";
 import "./index.css";
 
 function PublicOnlyRoute({ children }) {
@@ -68,6 +69,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AddMonitor />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pricing"
+          element={
+            <ProtectedRoute>
+              <Pricing />
             </ProtectedRoute>
           }
         />
