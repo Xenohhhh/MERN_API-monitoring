@@ -7,15 +7,16 @@ import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Resgister";
 import Pricing from "./pages/Pricing";
 import "./index.css";
+import { getStoredToken } from "./utils/auth";
 
 function PublicOnlyRoute({ children }) {
-  const token = localStorage.getItem("token");
+  const token = getStoredToken();
 
   return token ? <Navigate to="/dashboard" replace /> : children;
 }
 
 function ProtectedRoute({ children }) {
-  const token = localStorage.getItem("token");
+  const token = getStoredToken();
 
   return token ? children : <Navigate to="/login" replace />;
 }

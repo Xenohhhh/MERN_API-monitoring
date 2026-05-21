@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getMonitors } from "../services/monitorService";
 import MonitorCard from "../components/MonitorCard";
 import { useNavigate } from "react-router-dom";
+import { clearToken } from "../utils/auth";
 
 
 export default function Dashboard() {
@@ -10,7 +11,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    clearToken();
     navigate("/login");
   };
 

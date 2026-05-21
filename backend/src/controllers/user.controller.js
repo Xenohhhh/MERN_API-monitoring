@@ -42,6 +42,8 @@ export const registerUser = async (req, res) => {
             name
         })
 
+        const accessToken = generateAccessTokens(user)
+
         return res.status(201).json({
             success: true,
             message: `Welcome, ${name}`,

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import api from "../services/api";
+import { storeToken } from "../utils/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -12,8 +13,9 @@ export default function Login() {
         password,
       });
 
-      // save token
-      localStorage.setItem("token", res.data.accessToken);
+      if (!storeToken(res.data.accessToken)) {
+        throw new Error("Login response did not include an access token");
+      }
 
       // redirect
       window.location.href = "/dashboard";

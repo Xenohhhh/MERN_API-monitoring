@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { storeToken } from "../utils/auth";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -31,7 +32,9 @@ export default function Register() {
     const res = await api.post("/user/register", form);
 
     // 🔥 store token immediately
-    localStorage.setItem("token", res.data.accessToken);
+    if (!storeToken(res.data.accessToken)) {
+      throw new Error("Registration response did not include an access token");
+    }
 
     // 🔥 go directly to dashboard
     navigate("/dashboard");
