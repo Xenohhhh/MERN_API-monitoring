@@ -4,6 +4,7 @@ import connectDB from "../backend/src/db/index.js"
 import { Monitor } from "../backend/src/models/monitors.models.js"
 import { MonitorLog } from "../backend/src/models/monitorLog.models.js"
 import { sendEmail } from "../backend/src/utils/sendEmail.js";
+import { User } from "../backend/src/models/user.models.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -55,29 +56,48 @@ const worker = new Worker("monitorQueue",
       responseTime,
     });
 
-    // COMPARE BEFORE UPDATE
+    // Keep the previous value for deciding whether an alert is needed.
     const prevStatus = monitor.lastStatus;
+
 
     if (prevStatus !== newStatus) {
       console.log(`⚠️ Status changed: ${prevStatus} → ${newStatus}`);
 
-      await sendEmail(
-        process.env.EMAIL_USER,
-        "🚨 Monitor Alert",
-        `Monitor ${monitor.url} changed from ${prevStatus} to ${newStatus}`
-      );
-    }
+      try {
 
-    // ALWAYS UPDATE DB
+        const user = await User.findById(monitor.userId)
+
+        if (user && user.email) {
+          await sendEmail(
+            user.email,
+            "🚨 Monitor Alert",
+            `Monitor ${monitor.url} changed from ${prevStatus} to ${newStatus}`
+          );
+          console.log(`Alert email successfully sent to ${user.email}`);
+        }
+        else {
+          console.error(`Could not send email: User not found for monitor ${monitorId}`);
+        }
+
+      } catch (error) {
+        console.error("Failed to send monitor alert email:", error.message);
+      }
+
+    }
+    // Save status before notification delivery; email failure must not keep it stale.
     await Monitor.findByIdAndUpdate(monitorId, {
       lastStatus: newStatus,
-      lastCheckedAt: new Date(),
+      lastCheckedAt: new Date(start),
     });
+
   },
   {
     connection: {
-      host: "127.0.0.1",
-      port: 6379
+      url: process.env.REDIS_URL,
+      maxRetriesPerRequest: null,
+      tls: {
+        rejectUnauthorized: false
+      }
     }
   }
 );

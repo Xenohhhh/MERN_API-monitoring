@@ -1,10 +1,17 @@
-import {Queue} from "bullmq"
+import { Queue } from "bullmq"
+import dotenv from "dotenv"
 
-const monitorQueue = new Queue("monitorQueue", {
-    connection: {
-        host: "127.0.0.1",
-        port: 6379
+dotenv.config()
+
+
+const connection = {
+    url: process.env.REDIS_URL,
+    maxRetriesPerRequest: null,
+    tls: {
+        rejectUnauthorized: false
     }
-});
+};
+
+const monitorQueue = new Queue("monitorQueue", {connection});
 
 export default monitorQueue;

@@ -30,7 +30,13 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    fetchData();
+    const initialFetch = setTimeout(fetchData, 0);
+    const interval = setInterval(fetchData, 10000);
+
+    return () => {
+      clearTimeout(initialFetch);
+      clearInterval(interval);
+    };
   }, []);
 
   const headerActions = (
