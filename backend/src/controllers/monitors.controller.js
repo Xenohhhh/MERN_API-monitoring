@@ -1,4 +1,3 @@
-import { User } from "../models/user.models.js"
 import { Monitor } from "../models/monitors.models.js"
 import { PLAN_LIMITS } from "../config/plans.js"
 import monitorQueue from "../../../worker/queue.js";
@@ -97,15 +96,17 @@ export const postFunction = async (req, res) => {
 
 export const getFunction = async (req, res) => {
     try {
-        const userId = await User.findById(req.user._id)
+        const limit = PLAN_LIMITS[req.user.plan] || PLAN_LIMITS.free;
 
         const monitors = await Monitor.find({
-            userId: userId
+            userId: req.user._id
         })
             .sort({ createdAt: -1 })
 
         return res.status(200).json({
-            monitors
+            monitors,
+            plan: req.user.plan,
+            limit
         });
     }
     catch (error) {

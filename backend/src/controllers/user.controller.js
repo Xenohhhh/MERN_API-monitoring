@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import { User } from "../models/user.models.js";
+import { PLAN_LIMITS } from "../config/plans.js";
 
 
 const generateAccessTokens = (user) => {
@@ -102,7 +103,7 @@ export const upgradePlan = async (req, res) => {
   try {
     const { plan } = req.body;
 
-    if (!["free", "pro", "premium"].includes(plan)) {
+    if (!PLAN_LIMITS[plan]) {
       return res.status(400).json({
         message: "Invalid plan"
       });
