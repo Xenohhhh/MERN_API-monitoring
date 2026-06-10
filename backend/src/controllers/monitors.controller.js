@@ -1,6 +1,6 @@
 import { Monitor } from "../models/monitors.models.js"
 import { PLAN_LIMITS } from "../config/plans.js"
-import monitorQueue from "../../../worker/queue.js";
+import monitorQueue from "../queue.js";
 import { MonitorLog } from "../models/monitorLog.models.js"
 
 
